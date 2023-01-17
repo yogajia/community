@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>登录</title>
+    <link rel="stylesheet" href="Style.css" />
+    <script type="text/javascript" src="http://libs.baidu.com/jquery/2.0.0/jquery.js"></script>
+</head>
+
+<body>
+<div class="login-wrap">
+    <h3>欢迎登录一日记</h3>
+
+    <form id="login-form" class="wall">
+        <div class="login-content">
+            <label class="login-label">用户名</label>
+            <input id="username" class="login-input">
+        </div>
+
+        <div class="login-content">
+            <label calss="login-label">密&nbsp&nbsp码</label>
+            <input id="password" class="login-input" type="password">
+        </div>
+
+        <div align="center" class="login-content" id="identity">
+            <img id="image" src="../images/1.0.png" width="100px" height="30px">
+        </div>
+
+        <div align="center" class="catch">
+            <button id="identify" type="button" class="button">获取验证码</button>
+        </div>
+
+        <div>
+            <label>输入验证码:</label>
+            <input id="identify_text" type="text">
+        </div>
+
+        <div  align="center" class="catch">
+            <button id="Login" type="button" class="button">登&nbsp&nbsp录</button>
+        </div>
+
+        <div class="notice">
+            <label>没有账号？<a href="Register.html">点击注册</a></label>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    document.getElementById("Login").addEventListener("click", myFunction);
+    document.getElementById("identify").addEventListener("click", myFunction1);
+    var key="";
+    function myFunction() {
+        alert("提交测试！");
+        var $username=$("#username");//储存文本框的jQ对象
+        var $password=$("#password");//储存密码框的jQ对象
+        var $identify_text=$("#identify_text");//存储验证码的JQ对象
+        if($username.val()==""){//判断输入的账号是否为空
+            $username.next().text("账号为空").css({"font-weight":"bold","color":"red"});
+            event.preventDefault();//取消提交
+        }
+        else if($password.val()==""){
+            $password.next().text("密码为空").css({"font-weight":"bold","color":"red"});
+            event.preventDefault();
+        }
+        else{
+            var jsdata={"username":$username.val(),"password":$password.val(),"kaptcha":$identify_text.val(),"key":key};
+            console.log($identify_text.val());
+            alert("test");
+            //登录的ajax
+            $.ajax({
+                headers:{"Content-Type":'application/json;charset=utf-8'},
+                xhrFields:{
+                    withCredentials:true
+                },
+                //withCredentials:true,
+                crossDomain:true,
+                url:"http://127.0.0.1:8080/doLogin",
+                type:"post",
+                data:JSON.stringify(jsdata),
+                dataType:"json",
+                success:function(data){
+                    if(data.code==500){
+                        console.log(data);
+                        var s=data.msg;
+                        $username.next().text(s).css({"font-weight":"bold","color":"red"});
+                        $password.next().text(s).css({"font-weight":"bold","color":"red"});
+                    }
+                    else{
+                        alert("登录成功！");
+                    }
+                }
+            });
+        }/*else结束*/
+    }
+
+    function myFunction1(){
+        var $image =$("#image");
+        var $username = $("#username");
+        $.ajax({
+            headers:{"Content-Type":'application/json;charset=utf-8'},
+            xhrFields:{
+                withCredentials:true
+            },
+           // withCredentials:true,
+            crossDomain:true,
+            url:"http://127.0.0.1:8080/getVCpng",
+            type:"post",
+            dataType:"json",
+            success:function(data){
+                console.log(data);
+                url ="data:image/png;base64,"+data.code;
+                key=data.key;
+                $("#image").attr("src",url);
+                $("#username").append("修改输入框内容");
+            }
+        });
+    }
+</script>
+</body>
+</html>

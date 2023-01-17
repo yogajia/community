@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.accountbook.dao.DisburseMapper">
+    <cache type="com.example.accountbook.Cache.MybaitsRedisCache"/>
+    <cache-ref namespace="com.example.accountbook.dao.UserDao"/>
+    <insert id="addDisburse" parameterType="com.example.accountbook.pojo.Disburse">
+        insert into disburse(uid, type, amount, text) VALUES (#{uid},#{type},#{amount},#{text})
+    </insert>
+    <select id="queryDisburseById" resultType="com.example.accountbook.pojo.Disburse">
+        select * from disburse where uid=#{id}
+    </select>
+    <select id="queryDisburseByType" resultType="com.example.accountbook.pojo.Disburse">
+        select * from disburse
+        where uid=#{id} and type=#{type}
+    </select>
+    <select id="getDaysAmountsByType" resultType="Double">
+        select ifnull(sum(amount),0.00) from disburse
+        where uid=#{id} and type=#{type} and TO_DAYS(create_time)=TO_DAYS(NOW())
+    </select>
+    <select id="getWeeksAmountByType" resultType="Double">
+        select ifnull(sum(amount),0.00) from disburse
+        where uid=#{id} and type=#{type} and YEARWEEK(create_time)=YEARWEEK(NOW())
+    </select>
+    <select id="getMonthsAmountByType" resultType="Double">
+        select ifnull(sum(amount),0.00) from disburse
+        where uid=#{id} and type=#{type} and DATE_FORMAT(create_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')
+    </select>
+</mapper>
